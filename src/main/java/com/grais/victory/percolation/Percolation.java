@@ -6,24 +6,36 @@ public class Percolation {
 
     private boolean[][] data;
     private WeightedQuickUnionUF quickUnionUF;
+    private int top = 0;
+    private int bottom;
+    private int openSitesCount = 0;
 
     public Percolation(int size) {
         data = new boolean[size][size];
-        quickUnionUF = new WeightedQuickUnionUF(size * size);
+        quickUnionUF = new WeightedQuickUnionUF(size * size + 2);
+        bottom = size * size + 1;
     }
 
     public void open(int row, int col) {
         data[row][col] = true;
+        ++openSitesCount;
+        int lastIndex = data.length - 1;
+        if (row == 0) {
+            quickUnionUF.union(getIndex(row, col), top);
+        }
+        if (row == lastIndex) {
+            quickUnionUF.union(getIndex(row, col), bottom);
+        }
         if (row > 0 && isOpen(row - 1, col)) {
             quickUnionUF.union(getIndex(row, col), getIndex(row - 1, col));
         }
-        if (row < data.length - 1 && isOpen(row + 1, col)) {
+        if (row < lastIndex && isOpen(row + 1, col)) {
             quickUnionUF.union(getIndex(row, col), getIndex(row + 1, col));
         }
         if (col > 0 && isOpen(row, col - 1)) {
             quickUnionUF.union(getIndex(row, col), getIndex(row, col - 1));
         }
-        if (col < data.length - 1 && isOpen(row, col + 1)) {
+        if (col < lastIndex && isOpen(row, col + 1)) {
             quickUnionUF.union(getIndex(row, col), getIndex(row, col + 1));
         }
     }
@@ -35,40 +47,19 @@ public class Percolation {
     public boolean isFull(int row, int col) {
         if (row == 0)
             return true;
-        for (int i = 0; i < data.length; i++) {
-            if (quickUnionUF.connected(getIndex(row, col), getIndex(0, i)))
-                return true;
-        }
-        return false;
+        return quickUnionUF.connected(getIndex(row, col), top);
     }
 
     private int getIndex(int row, int col) {
-        return row * data.length + col;
+        return row * data.length + col + 1;
     }
 
     public int numberOfOpenSites() {
-        int count = 0;
-        for (boolean[] rows : data) {
-            for (boolean site : rows) {
-                count += site ? 1 : 0;
-            }
-        }
-        return count;
+        return openSitesCount;
     }
 
     public boolean percolates() {
-        int topStartIndex = getIndex(0, 0);
-        int topEndIndex = getIndex(0, data.length - 1);
-        int bottomStartIndex = getIndex(data.length - 1, 0);
-        int bottomEndIndex = getIndex(data.length - 1, data.length - 1);
-        for (int i = bottomStartIndex; i <= bottomEndIndex; i++) {
-            for (int j = topStartIndex; j <= topEndIndex; j++) {
-                if (quickUnionUF.connected(i, j)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return quickUnionUF.connected(top, bottom);
     }
 
     public static void main(String[] args) {
