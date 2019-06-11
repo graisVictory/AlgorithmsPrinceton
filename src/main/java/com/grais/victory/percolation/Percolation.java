@@ -62,27 +62,4 @@ public class Percolation {
         return quickUnionUF.connected(top, bottom);
     }
 
-    public static void main(String[] args) {
-        Percolation percolation = new Percolation(10);
-        percolation.open(0, 1);
-        percolation.open(1, 1);
-        System.out.println(percolation.numberOfOpenSites());
-        System.out.println(percolation.percolates());
-        System.out.println("------------------------------");
-        percolation.open(2,2);
-        System.out.println(percolation.isFull(2,2));
-        System.out.println("------------------------------");
-        percolation.open(2, 1);
-        percolation.open(3, 1);
-        percolation.open(4, 1);
-        percolation.open(5, 1);
-        System.out.println(percolation.isFull(5,1));
-        percolation.open(6, 1);
-        percolation.open(7, 1);
-        percolation.open(8, 1);
-        percolation.open(9, 1);
-        System.out.println("------------------------------");
-        System.out.println(percolation.percolates());
-    }
-
 }
